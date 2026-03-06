@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.6.0] - 2026-03-05
+
+### Fixed
+- Removed nmcli completely
+
+
 ## [0.5.4] - 2025-11-03
 
 ### Added

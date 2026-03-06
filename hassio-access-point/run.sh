@@ -64,8 +64,8 @@ logger "Add to /etc/network/interfaces: iface $INTERFACE inet static" 1
 # Create and add our interface to interfaces file
 echo "iface $INTERFACE inet static"$'\n' >> /etc/network/interfaces
 
-logger "Run command: nmcli dev set $INTERFACE managed no" 1
-nmcli dev set $INTERFACE managed no
+# logger "Run command: nmcli dev set $INTERFACE managed no" 1
+# nmcli dev set $INTERFACE managed no
 
 logger "Run command: ip link set $INTERFACE down" 1
 ip link set $INTERFACE down
@@ -167,29 +167,13 @@ if $(bashio::config.true "dhcp"); then
 
     ## DNS
     dns_array=()
-        if [ ${#CLIENT_DNS_OVERRIDE} -ge 1 ]; then
-            dns_string="dhcp-option=6"
-            DNS_OVERRIDES=($CLIENT_DNS_OVERRIDE)
-            for override in "${DNS_OVERRIDES[@]}"; do
-                dns_string+=",$override"
-            done
-            echo "$dns_string"$'\n' >> /dnsmasq.conf
-            logger "Add custom DNS: $dns_string" 0
-        else
-            IFS=$'\n' read -r -d '' -a dns_array < <( nmcli device show | grep IP4.DNS | awk '{print $2}' && printf '\0' )
-
-            if [ ${#dns_array[@]} -eq 0 ]; then
-                logger "Couldn't get DNS servers from host. Consider setting with 'client_dns_override' config option." 0
-            else
-                dns_string="dhcp-option=6"
-                for dns_entry in "${dns_array[@]}"; do
-                    dns_string+=",$dns_entry"
-                done
-                echo "$dns_string"$'\n' >> /dnsmasq.conf
-                logger "Add DNS: $dns_string" 0
-            fi
-
-        fi
+        dns_string="dhcp-option=6"
+        DNS_OVERRIDES=($CLIENT_DNS_OVERRIDE)
+        for override in "${DNS_OVERRIDES[@]}"; do
+            dns_string+=",$override"
+        done
+        echo "$dns_string"$'\n' >> /dnsmasq.conf
+        logger "Add custom DNS: $dns_string" 0
 
     # Append override options to dnsmasq.conf
     if [ ${#DNSMASQ_CONFIG_OVERRIDE} -ge 1 ]; then
